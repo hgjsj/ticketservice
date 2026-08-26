@@ -1,0 +1,11 @@
+/.venv/
+__pycache__/
+**/__pycache__/
+ticket/ticket.db
+auth_service/auth.db
+frontend/node_modules/
+frontend/dist/
+.DS_Store
+.venv/
+*.pyc
+

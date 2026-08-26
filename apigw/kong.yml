@@ -1,0 +1,92 @@
+_format_version: "3.0"
+_transform: true
+
+consumers:
+  - username: ticket-api-client
+    custom_id: ticket-api-client
+
+jwt_secrets:
+  - consumer: ticket-api-client
+    key: ticket-service-auth
+    secret: change-me
+    algorithm: HS256
+
+services:
+  - name: auth-service-backend
+    url: http://host.containers.internal:8002
+    routes:
+      - name: auth-service-api
+        paths:
+          - /api/auth
+        strip_path: true
+        preserve_host: false
+
+  - name: ticket-service
+    url: http://host.containers.internal:8000
+    routes:
+      - name: ticket-service-api
+        paths:
+          - /api/ticket
+        strip_path: true
+        preserve_host: false
+    plugins:
+      - name: jwt
+        config:
+          key_claim_name: iss
+          claims_to_verify:
+            - exp
+          run_on_preflight: false
+      - name: post-function
+        config:
+          access:
+            - |
+              local authorization = kong.request.get_header("authorization")
+              local token = authorization and authorization:match("[Bb]earer%s+(.+)")
+
+              if token then
+                local payload_segment = token:match("^[^.]+%.([^.]+)%.")
+                if payload_segment then
+                  payload_segment = payload_segment:gsub("-", "+"):gsub("_", "/")
+                  local remainder = #payload_segment % 4
+                  if remainder > 0 then
+                    payload_segment = payload_segment .. string.rep("=", 4 - remainder)
+                  end
+
+                  local claims = ngx.decode_base64(payload_segment)
+
+                  if claims then
+                    local user_id = claims:match('"sub"%s*:%s*"([^"\\]+)"')
+                    local username = claims:match('"username"%s*:%s*"([^"\\]+)"')
+                    local phone_number = claims:match('"phone_number"%s*:%s*"([^"\\]+)"')
+                    local department = claims:match('"department"%s*:%s*"([^"\\]+)"')
+
+                    kong.service.request.set_header("X-Authenticated-User-Id", user_id or "")
+                    kong.service.request.set_header("X-Authenticated-Username", username or "")
+                    kong.service.request.set_header("X-Authenticated-Phone-Number", phone_number or "")
+                    kong.service.request.set_header("X-Authenticated-Department", department or "")
+                    kong.service.request.set_header("X-Gateway-Secret", "change-me-gateway")
+                  end
+                end
+              end
+
+plugins:
+  - name: cors
+    config:
+      origins:
+        - http://localhost:5173
+        - http://127.0.0.1:5173
+      methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      headers:
+        - Accept
+        - Authorization
+        - Content-Type
+      exposed_headers:
+        - X-Request-Id
+      credentials: true
+      max_age: 3600

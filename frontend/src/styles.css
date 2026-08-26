@@ -1,0 +1,124 @@
+:root {
+  font-family: "Noto Sans SC", "Source Han Sans SC", sans-serif;
+  color: #1b1e28;
+  background: radial-gradient(circle at 20% 20%, #e5f4ff 0, #f7fbff 45%, #f5f7fb 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+header h1 {
+  margin-bottom: 4px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+}
+
+.ticket-form,
+.auth-form,
+.ticket-card {
+  background: #fff;
+  border: 1px solid #e3e8f2;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ticket-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+input,
+textarea,
+select,
+button {
+  border-radius: 10px;
+  border: 1px solid #cfd6e3;
+  padding: 10px;
+  font: inherit;
+}
+
+button {
+  background: #0842a0;
+  color: white;
+  cursor: pointer;
+}
+
+.ticket-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ticket-head,
+.ticket-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.badge {
+  font-size: 12px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  color: white;
+}
+
+.badge-open { background: #0077b6; }
+.badge-in_progress { background: #f8961e; }
+.badge-resolved { background: #2a9d8f; }
+.badge-closed { background: #6c757d; }
+
+.empty {
+  color: #555;
+}
+
+.hint {
+  margin: 0;
+  color: #2f4f8f;
+  font-size: 13px;
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
